@@ -27,8 +27,8 @@ from sklearn.model_selection import KFold
 
 from torch.autograd import Variable
 import warnings
+
 warnings.filterwarnings("ignore")
-warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 mean_nums = [0.485, 0.456, 0.406]
 std_nums = [0.229, 0.224, 0.225]
@@ -55,7 +55,6 @@ transform_test = transforms.Compose([
     # transforms.Normalize((.5,.5,.5), (.5,.5,.5))
 ])
 
-
 filepath_bus = './data/BUS/BUS/'
 filepath_STU = './data/STU-Hospital-master/'
 # filepath_busi_m = './data/Dataset_BUSI_malignant/Dataset_BUSI_with_GT/'
@@ -63,9 +62,10 @@ filepath_STU = './data/STU-Hospital-master/'
 filepath_Polyp = './data/Kvasir-SEG/'
 filepath_load = './data/my_datasets/'
 
-
 ALPHA = 0.8
 GAMMA = 2
+
+
 class FocalLoss(nn.Module):
     def __init__(self, weight=None, size_average=True):
         super(FocalLoss, self).__init__()
@@ -86,7 +86,6 @@ class FocalLoss(nn.Module):
         return focal_loss
 
 
-
 class DiceLoss(nn.Module):
     def __init__(self, weight=None, size_average=True):
         super(DiceLoss, self).__init__()
@@ -103,6 +102,7 @@ class DiceLoss(nn.Module):
         dice = (2. * intersection + smooth) / (inputs.sum() + targets.sum() + smooth)
 
         return 1 - dice
+
 
 criterion_focal = FocalLoss()
 criterion_dice = DiceLoss()
@@ -129,7 +129,6 @@ def get_logger(filename, verbosity=1, name=None):
     return logger
 
 
-
 def train(train_loader, model, epoch, args, DEVICE):
     model.train()
     sum_total_loss_batch = 0
@@ -142,13 +141,12 @@ def train(train_loader, model, epoch, args, DEVICE):
     acc_score = 0
     f1_score = 0
     spe_score = 0
-    
+
     if args.loss_name == "dice":
         criterion_loss = criterion_dice
     elif args.loss_name == "focal":
         criterion_loss = criterion_focal
-    
-    
+
     for batch_idx, (img, label) in enumerate(train_loader):
         loss = [0 for i in range(6)]
         total_loss = 0
@@ -162,7 +160,8 @@ def train(train_loader, model, epoch, args, DEVICE):
             loss_sum[i] += loss[i].data.item()
         for i in range(6):
             total_loss += loss[i]
-        dice, jc, pre, rec, spe, acc, f1 = calculate_metric_percase(torch.where(output[0] > 0.5, 1., 0.).cpu(), label.cpu())
+        dice, jc, pre, rec, spe, acc, f1 = calculate_metric_percase(torch.where(output[0] > 0.5, 1., 0.).cpu(),
+                                                                    label.cpu())
         pre_score += pre
         recall_score += rec
         dice_score += dice
@@ -183,8 +182,8 @@ def train(train_loader, model, epoch, args, DEVICE):
             sum_total_loss_batch = 0
             loss_sum = [0 for i in range(6)]
     # pdb.set_trace()
-    
-    print("\nTrain Epoch: {}".format(epoch))  
+
+    print("\nTrain Epoch: {}".format(epoch))
     print("pre_score: \t{:.4f}".format(pre_score / len(train_loader)))
     print("recall_score: \t{:.4f}".format(recall_score / len(train_loader)))
     print("dice_score: \t{:.4f}".format(dice_score / len(train_loader)))
@@ -234,7 +233,7 @@ def test(test_loader, model, args):
             Out0, Out1, Out2, Out3, Out4, Out5 = model(img)
             # mask_pred = (Out1>0.5).float()
             mask_pred = torch.where(Out0 > 0.5, 1., 0.)
-            # 可视化
+            # Visualization
             # plt.imshow(transforms.ToPILImage()(mask_pred.squeeze()), interpolation="bicubic")
             # transforms.ToPILImage()(Out1.squeeze()).show()  # Alternatively
             # plt.imshow(transforms.ToPILImage()(mask_true.squeeze()), interpolation="bicubic")
@@ -278,8 +277,6 @@ def adjust_learning_rate(optimizer, epoch):
             param_group['lr'] = param_group['lr'] * 0.1
 
 
-
-
 if __name__ == '__main__':
 
     parse = argparse.ArgumentParser()
@@ -297,29 +294,29 @@ if __name__ == '__main__':
     parse.add_argument("--data_name", type=str, default="stu")
     parse.add_argument("--loss_name", type=str, default="dice")
     args = parse.parse_args()
-    
+
     if args.data_name == "bus":
         filepath = filepath_bus
     elif args.data_name == "polyp":
         filepath = filepath_Polyp
     elif args.data_name == "stu":
         filepath = filepath_STU
-    
+
     imagefilepath = filepath + 'data_mask/images/'
     imagefilepath_label = filepath + 'data_mask/masks/'
-    
+
     if args.DEVICE == 0:
         DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     else:
-        DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")   
-    
+        DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+
     logger = get_logger(args.log_name)
 
     total_img = os.listdir(imagefilepath)
     total_label = os.listdir(imagefilepath_label)
 
     skf = KFold(n_splits=4, shuffle=True)
-    
+
     for i, (train_idx, val_idx) in enumerate(skf.split(total_img, total_label)):
         print("k_fold training : {} ".format(i))
         logging.info("k_fold training : {} ".format(i))
@@ -331,13 +328,12 @@ if __name__ == '__main__':
         train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=6, shuffle=True, drop_last=True)
         val_dataset = torch.utils.data.DataLoader(val_dataset, batch_size=6, shuffle=False, drop_last=True)
 
-        model = model_net.DDNet(m = args.M, flag = args.DNM).to(DEVICE)
+        model = model_net.DDNet(m=args.M, flag=args.DNM).to(DEVICE)
         optimizer = optim.Adam(model.parameters(), lr=args.LR)
-        
+
         for epoch in range(1, args.EPOCH + 1):
             train_loss = train(train_loader, model, epoch, args, DEVICE)
             pre, recall, dice, jaccard, spe, test_loss, acc, f1 = test(val_dataset, model, args)
             logger.info(f'Epoch {epoch}: train_loss={train_loss:.4f}, '
                         f'pre={pre:.4f}, recall={recall:.4f}, dice={dice:.4f}, jaccard={jaccard:.4f},spe={spe:.4f},acc={acc:.4f},f1={f1:.4f},test_loss={test_loss:.4f},')
             adjust_learning_rate(optimizer, epoch)
-
