@@ -14,7 +14,7 @@ DDNet is a novel network that integrates biologically interpretable dendritic ne
 
 DDNet presents a novel segmentation approach that leverages dendritic neurons to tackle the challenges of medical imaging segmentation. The model enhance the segmentation accuracy based on a SegNet variant including an encoder-decoder structure, an upsampling index, and a deep supervision method. Furthermore, the model introduce a dendritic neuron-based convolutional block to enable nonlinear feature mapping, thereby further improving the effectiveness of our approach. 
 
-![demo](./results.png)
+![demo](./Results.png)
 
 The proposed method is evaluated on medical imaging segmentation datasets, and the experimental results demonstrate that it is superior to state-of-the-art methods in terms of performance.
 
