@@ -47,9 +47,9 @@ parse.add_argument("--DNM2", type=int, default=1)
 parse.add_argument("--ckpt", type=str, help="the path of model weight file")
 args = parse.parse_args()
 if args.DEVICE == 0:
-    DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # 使用GPU或者CPU训练
+    DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 else:
-    DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")  # 使用GPU或者CPU训练
+    DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
 mean_nums = [0.485, 0.456, 0.406]
 std_nums = [0.229, 0.224, 0.225]
@@ -115,7 +115,7 @@ class DiceLoss(nn.Module):
         return 1 - dice
 
 
-# 损失函数和模型调用
+# LOSS
 # criterion = nn.CrossEntropyLoss()
 criterion = nn.BCELoss()
 criterion_mse = nn.MSELoss()
@@ -124,14 +124,14 @@ criterion_dice = DiceLoss()
 model = model_net.DDNet()
 model.to(DEVICE)
 
-# 预训练模型和优化器的选用：
+# Selection of pre-trained models and optimizers：
 # pretrained_model = "./log/bus_0.5loss_norm.log.pth"
 pretrained_model = "./pic/model/pic_polyp_ours.pth"
 
 # optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0.09)
 optimizer = optim.Adam(model.parameters(), lr=args.LR)
 
-# 预训练模型加载
+# Pre-trained model loading
 pretrained = 0
 if pretrained:
     pretrain_model = model_net.DDNet()
