@@ -4,16 +4,16 @@ import random
 import shutil
 
 '''
-├── data(按照7:2:1比例划分)
-│   ├── train 存放用于训练的图片
-│   ├── trainannot 存放用于训练的图片标注
-│   ├── val 存放用于验证的图片
-│   ├── valannot 存放用于验证的图片标注
-│   ├── test 存放用于测试的图片
-│   ├── testannot 存放用于测试的图片标注
+├── data (divided according to the ratio of 7:2:1)
+│ ├── train stores images used for training
+│ ├── trainannot stores image annotations used for training
+│ ├── val stores images used for verification
+│ ├── valannot stores image annotations for verification
+│ ├── test stores images used for testing
+│ ├── testannot stores image annotations for testing
 '''
 
-# 数据集原始图片所存放的文件夹，必须为png文件
+# The folder where the original images of the data set are stored must be png files. If it is not png, change the following content
 filepath_bus = './data/BUS/BUS/'
 filepath_busi = './data/Dataset_BUSI/Dataset_BUSI_with_GT/'
 filepath_cloth = './data/archive/'
@@ -62,7 +62,7 @@ test_percent = 0
 
 total_img = os.listdir(imagefilepath)
 
-# 所有数据集的图片名列表
+
 total_name_list = [row.split('.')[0] for row in total_img]
 num = len(total_name_list)
 # pdb.set_trace()
@@ -70,19 +70,18 @@ num = len(total_name_list)
 
 
 num_list = range(num)
-# 训练集、验证集、测试集所包含的图片数目
+
 train_tol = int(num * train_percent)
 val_tol = int(num * val_percent)
 test_tol = int(num * test_percent)
 
-# 训练集在total_name_list中的index
+
 train_numlist = random.sample(num_list, train_tol)
-# 验证集在total_name_list中的index
 val_test_numlist = list(set(num_list) - set(train_numlist))
 val_numlist = random.sample(val_test_numlist, val_tol)
-# 测试集在total_name_list中的index
+
 test_numlist = list(set(val_test_numlist) - set(val_numlist))
-# 将数据集和标签图片安装分类情况依次复制到对应的文件夹
+
 for i in train_numlist:
     img_path = filepath + 'data_mask/images/' + total_name_list[i] + '.png'
     new_path = filepath + 'data/train/' + total_name_list[i] + '.png'
