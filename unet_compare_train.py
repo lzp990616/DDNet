@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torchmetrics
 import torchvision
 import torchvision.transforms as transforms
 import torch.nn.functional as F
@@ -26,7 +27,7 @@ from model.mbsnet import MBSNet
 from model.nestedUNet import NestedUNet
 from sklearn.metrics import accuracy_score, f1_score
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 warnings.filterwarnings("ignore")
 
 parse = argparse.ArgumentParser()
@@ -34,17 +35,17 @@ parse = argparse.ArgumentParser()
 # parse.add_argument("action", type=str, help="train or test")
 parse.add_argument("--log_name", type=str, default="./log/test.log")
 parse.add_argument("--model_name", type=str, default="test")
-parse.add_argument("--data_name", type=str, default="stu")
-parse.add_argument("--batch_size", type=int, default=2)
+parse.add_argument("--data_name", type=str, default="log_Polyp")
+parse.add_argument("--batch_size", type=int, default=8)
 parse.add_argument("--EPOCH", type=int, default=100)
 parse.add_argument("--LR", type=float, default=0.001)
 parse.add_argument("--DEVICE", type=int, default=0)
 parse.add_argument("--ckpt", type=str, help="the path of model weight file")
 args = parse.parse_args()
 if args.DEVICE == 0:
-    DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # 使用GPU或者CPU训练
+    DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 else:
-    DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")  # 使用GPU或者CPU训练
+    DEVICE = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
 transform = transforms.Compose([
     transforms.Resize((256, 256), Image.BILINEAR),
@@ -56,7 +57,7 @@ transform = transforms.Compose([
 
 transform_test = transforms.Compose([
     transforms.Resize((256, 256), Image.BILINEAR),
-    transforms.ToTensor(),  
+    transforms.ToTensor(),
     # transforms.Grayscale(num_output_channels=1),
 ])
 
@@ -128,8 +129,8 @@ class FocalLoss(nn.Module):
         focal_loss = alpha * (1 - BCE_EXP) ** gamma * BCE
 
         return focal_loss
-        
-        
+
+
 def met_fun(predict, target):  # Sensitivity, Recall, true positive rate都一样
     if torch.is_tensor(predict):
         predict = torch.sigmoid(predict).data.cpu().numpy()
@@ -144,8 +145,6 @@ def met_fun(predict, target):  # Sensitivity, Recall, true positive rate都一�
     fn = numpy.count_nonzero(~predict & target)
     fp = numpy.count_nonzero(predict & ~target)
 
-
-
     return tp, fp, tn, fn
 
 
@@ -157,11 +156,11 @@ criterion_dice = DiceLoss()
 # model = U_Net().to(DEVICE)
 
 if args.model_name == "unet":
-    model = U_Net().to(DEVICE)	
+    model = U_Net().to(DEVICE)
 elif args.model_name == "SegNet":
     model = SegNet().to(DEVICE)
-elif args.model_name == "AAUnet":
-    model = AUUnet().to(DEVICE) 
+# elif args.model_name == "AAUnet":
+#     model = AUUnet().to(DEVICE)
 elif args.model_name == "R2U_Net":
     model = R2U_Net().to(DEVICE)
 elif args.model_name == "AttU_Net":
@@ -174,31 +173,26 @@ elif args.model_name == "mbsnet":
     model = MBSNet().to(DEVICE)
 elif args.model_name == "transunet":
     model = TransUNet(img_dim=128,
-                  in_channels=3,
-                  out_channels=128,
-                  head_num=4,
-                  mlp_dim=512,
-                  block_num=8,
-                  patch_dim=16,
-                  class_num=1).to(DEVICE)
+                      in_channels=3,
+                      out_channels=128,
+                      head_num=4,
+                      mlp_dim=512,
+                      block_num=8,
+                      patch_dim=16,
+                      class_num=1).to(DEVICE)
 elif args.model_name == "sknet":
     model = SKNet26().to(DEVICE)
-elif args.model_name == "unext":
-    model = UNeXt().to(DEVICE)
+# elif args.model_name == "unext":
+#     model = UNeXt().to(DEVICE)
 else:
-    raise ValueError("Invalid model name: " + args.model_name)  
+    raise ValueError("Invalid model name: " + args.model_name)
 
-
-
-
-
-
-# 预训练模型和优化器的选用：
+# Selection of pre-trained models and optimizers：
 # pretrained_model = "./log_beifen_weight/bus_2dnm_adam1e-4_epoch160_batchSize8.log.pth"
 # optimizer = optim.SGD(model.parameters(), lr=LR, momentum=0.09)
 optimizer = optim.Adam(model.parameters(), lr=args.LR)
 
-# 预训练模型加载
+# Pre-trained model loading
 pretrained = 0
 if pretrained:
     pretrain_model = model_net.DDNet(DEVICE)
@@ -206,7 +200,7 @@ if pretrained:
     pretrain_model.load_state_dict(pre_dic["model_static_dict"])
     model_dict = model.state_dict()
     pretrained_dict = pretrain_model.state_dict()
-    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}  # 选择相同的部分
+    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
     model_dict.update(pretrained_dict)
     model.load_state_dict(model_dict)
     model.eval()
@@ -247,7 +241,7 @@ def calculate_metric_percase(pred, gt):
 
     pred = numpy.atleast_1d(predict.astype(numpy.bool))
     gt = numpy.atleast_1d(target.astype(numpy.bool))
-    
+
     rec = metric.binary.recall(pred, gt)
     spe = metric.binary.specificity(pred, gt)
     dice = metric.binary.dc(pred, gt)
@@ -261,7 +255,7 @@ def calculate_metric_percase(pred, gt):
 
 
 def train(epoch):
-    model.train()  # 模型的训练模式
+    model.train()
     loss_sum = 0
     loss_sum_batch = 0
     dice_score = 0
@@ -277,15 +271,14 @@ def train(epoch):
         output = model(img)
         output = output.float().cpu()
         # mask_pred = torch.where(output > 0.5, 1., 0.)
-        mask_true = label.cpu()       
+        mask_true = label.cpu()
         loss = criterion_dice(output, mask_true)
         loss_sum += loss.data.item()
         loss_sum_batch += loss.data.item()
         loss.backward()
         optimizer.step()
         dice, jc, pre, rec, spe, acc, f1 = calculate_metric_percase(torch.where(output > 0.5, 1., 0.).cpu(), mask_true)
-        
-        
+
         # print(dice, jc, pre, rec, spe, )
         pre_score += pre
         recall_score += rec
@@ -294,7 +287,7 @@ def train(epoch):
         spe_score += spe
         acc_score += acc
         f1_score += f1
-        if (i+1) % 10 == 0:
+        if (i + 1) % 10 == 0:
             print("EPOCH: {}\tTrain_loss: {:.6f}".format(epoch, loss_sum_batch / 10))
             loss_sum_batch = 0
 
@@ -308,7 +301,7 @@ def train(epoch):
     print("spe_score: \t{:.4f}".format(spe_score / len(train_loader)))
     print("acc_score: \t{:.4f}".format(acc_score / len(test_loader)))
     print("f1_score: \t{:.4f}".format(f1_score / len(test_loader)))
-    return loss_sum/ len(test_loader)
+    return loss_sum / len(test_loader)
 
 
 # mask_pred = output.float().cpu()
@@ -331,16 +324,16 @@ def test(epoch):
         img, label = img.to(DEVICE), label.to(DEVICE)
         with torch.no_grad():
             output = model(img)
-            mask_pred = torch.sigmoid(output) 
+            mask_pred = torch.sigmoid(output)
             mask_pred = torch.where(mask_pred > 0.5, 1., 0.)
             mask_true = label.cpu()
             # mask_true = label.to(device=DEVICE, dtype=torch.long).float().cpu()
             # if epoch == 10:
-                # pdb.set_trace()
+            # pdb.set_trace()
             # mask_true = torch.where(label == 0., 0., 1.
 
             # mask_true = label.to(device=DEVICE, dtype=torch.long).cpu()
-            # 可视化
+            # Visualization
             # plt.imshow(transforms.ToPILImage()(mask_pred[0].squeeze()), interpolation="bicubic")
             # transforms.ToPILImage()(mask_pred[0].squeeze()).show()  # Alternatively
 
@@ -372,20 +365,19 @@ def test(epoch):
     print("test_loss: \t{:.4f}\n".format(sum_total_loss / len(test_loader)))
 
     return pre_score / len(test_loader), recall_score / len(test_loader), dice_score / len(
-    test_loader), jaccard_score / len(test_loader), spe_score / len(test_loader), sum_total_loss / len(
-    test_loader), acc_score / len(
-    test_loader), f1_score / len(
-    test_loader)
-
+        test_loader), jaccard_score / len(test_loader), spe_score / len(test_loader), sum_total_loss / len(
+        test_loader), acc_score / len(
+        test_loader), f1_score / len(
+        test_loader)
 
 
 if __name__ == "__main__":
     min = 1.
     for epoch in range(1, args.EPOCH + 1):
-        train_loss = train(epoch)  # 调用训练函数
+        train_loss = train(epoch)
         pre, recall, dice, jaccard, spe, test_loss, acc, f1 = test(epoch)
         logger.info(f'Epoch {epoch}: train_loss={train_loss:.4f}, '
-                        f'pre={pre:.4f}, recall={recall:.4f}, dice={dice:.4f}, jaccard={jaccard:.4f},spe={spe:.4f},acc={acc:.4f},f1={f1:.4f},test_loss={test_loss:.4f},')
+                    f'pre={pre:.4f}, recall={recall:.4f}, dice={dice:.4f}, jaccard={jaccard:.4f},spe={spe:.4f},acc={acc:.4f},f1={f1:.4f},test_loss={test_loss:.4f},')
         if min > test_loss:
             min = test_loss
             checkpoint = {
