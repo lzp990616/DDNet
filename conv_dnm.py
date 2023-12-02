@@ -132,7 +132,7 @@ class DNM_Linear(nn.Module):
         x = torch.sum(x, 3)
         # x = torch.sigmoid(x)
         # x = F.relu(x)
-        pdb.set_trace()
+        # pdb.set_trace()
         # Membrane
         # x = torch.mul(x, self.params['membrane_W'])
         # x = x * self.params['membrane_W']
@@ -188,9 +188,6 @@ class DNM_Conv(nn.Module):
         x = F.relu(torch.mul(x, self.params['DNM_W']) - self.params['q'])
         # x = torch.mul(x, self.params['DNM_W'])
         # x = F.relu(self.k * (x - self.params['q']))
-        
-        
-        
         
         # Dendritic
         x = self.norm2(x) # norm、
