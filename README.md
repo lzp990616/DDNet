@@ -43,26 +43,28 @@ The proposed method is evaluated on medical imaging segmentation datasets, and t
 ```
 
 ### Data_process:
-`python data_spilt.py  # Spilt the data. Select data by changing 'filepath' in code`
-
+```python
+python data_spilt.py  # Spilt the data. Select data by changing 'filepath' in code
+```
 ### K-folder_experiment:
-`python k_folder.py --log_name "./log/log_name.log" --data_name stu --batch_size 8 --EPOCH 100 --LR 0.0005 --LOSSK 0.1 --DNM 1 --M 10`
-
+```python
+python k_folder.py --log_name "./log/log_name.log" --data_name stu --batch_size 8 --EPOCH 100 --LR 0.0005 --LOSSK 0.1 --DNM 1 --M 10
+```
 ### Comparative_experiment:
-`python compare_kfold.py --log_name "./log/log_name.log" --data_name stu --model_name unet --batch_size 8 --EPOCH 100 --LR 0.0005`
-
+```python
+python compare_kfold.py --log_name "./log/log_name.log" --data_name stu --model_name unet --batch_size 8 --EPOCH 100 --LR 0.0005
+```
 ### Pic_experiment:
-`python unet_train.py --log_name "./log/log_name.log" --data_name stu --batch_size 8 --EPOCH 100 --LR 0.0005 --LOSSK 0.1 --DNM 1 --M 10`
-
-`python unet_compare_train.py --log_name "./log/log_name.log" --data_name stu --batch_size 8 --EPOCH 100 --LR 0.0005`
-
+```python
+python unet_train.py --log_name "./log/log_name.log" --data_name stu --batch_size 8 --EPOCH 100 --LR 0.0005 --LOSSK 0.1 --DNM 1 --M 10
+python unet_compare_train.py --log_name "./log/log_name.log" --data_name stu --batch_size 8 --EPOCH 100 --LR 0.0005
+```
 ### Pic_plot:
-`python predicted.py`
-
-`python predicted_other_model.py`
-
-`predicted_other_model_pic.py  # If the number of pictures and the name of the model are changed, the file needs to be changed.` 
-
+```python
+python predicted.py
+python predicted_other_model.py
+predicted_other_model_pic.py  # If the number of pictures and the name of the model are changed, the file needs to be changed.`
+```
 ## Related Projects
 
 Our code is based on [PyTorch](https://github.com/pytorch/pytorch).
