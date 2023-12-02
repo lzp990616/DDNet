@@ -24,7 +24,6 @@ filepath = filepath_stu
 # filepath = file_path_busi_m
 
 
-# 创建数据集文件夹
 dirpath_list = [filepath+'/data/train',
                 filepath+'/data/trainannot',
                 filepath+'/data/val',
