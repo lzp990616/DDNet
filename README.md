@@ -28,7 +28,7 @@ The proposed method is evaluated on medical imaging segmentation datasets, and t
 │   ├── Kvasir-SEG
 │   ├── STU-Hospital-master
 
-    ├── Bus(Kvasir-SEG, STU-Hospital-master...)
+    ├── Bus(polyp, STU-Hospital-master...)
     │   ├── data_mask
     │       ├── images
     │       ├── masks
