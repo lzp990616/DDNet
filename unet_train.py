@@ -266,7 +266,7 @@ def test(epoch):
             # mask_pred = (Out1>0.5).float()
             mask_pred = torch.where(output[0] > 0.5, 1., 0.)
 
-            # 可视化
+            # Visualization
             # plt.imshow(transforms.ToPILImage()(mask_pred.squeeze()), interpolation="bicubic")
             # transforms.ToPILImage()(output[0].squeeze()).show()  # Alternatively
             # plt.imshow(transforms.ToPILImage()(mask_true.squeeze()), interpolation="bicubic")
