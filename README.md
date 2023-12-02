@@ -14,7 +14,7 @@ DDNet is a novel network that integrates biologically interpretable dendritic ne
 
 DDNet presents a novel segmentation approach that leverages dendritic neurons to tackle the challenges of medical imaging segmentation. The model enhance the segmentation accuracy based on a SegNet variant including an encoder-decoder structure, an upsampling index, and a deep supervision method. Furthermore, the model introduce a dendritic neuron-based convolutional block to enable nonlinear feature mapping, thereby further improving the effectiveness of our approach. 
 
-![demo](./DDNet_structure.png)
+![demo](./results.png)
 
 The proposed method is evaluated on medical imaging segmentation datasets, and the experimental results demonstrate that it is superior to state-of-the-art methods in terms of performance.
 
@@ -53,11 +53,14 @@ The proposed method is evaluated on medical imaging segmentation datasets, and t
 
 ### Pic_experiment:
 `python unet_train.py --log_name "./log/log_name.log" --data_name stu --batch_size 8 --EPOCH 100 --LR 0.0005 --LOSSK 0.1 --DNM 1 --M 10`
+
 `python unet_compare_train.py --log_name "./log/log_name.log" --data_name stu --batch_size 8 --EPOCH 100 --LR 0.0005`
 
 ### Pic_plot:
 `python predicted.py`
+
 `python predicted_other_model.py`
+
 `predicted_other_model_pic.py  # If the number of pictures and the name of the model are changed, the file needs to be changed.` 
 
 ## Related Projects
