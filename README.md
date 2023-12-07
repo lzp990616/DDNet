@@ -72,7 +72,7 @@ Our code is based on [PyTorch](https://github.com/pytorch/pytorch).
 ## Citing DDNet
 
 ```bib
-@articleInfo{JAS-2023-0532,
+@articleInfo{liu2024dendritic,
 author = {Zhipeng Liu","Zhiming Zhang","Zhenyu Lei","Masaaki Omura","Rong-Long Wang","Shangce Gao"}
 title = {Dendritic Deep Learning for Medical Segmentation},
 journal = {IEEE/CAA Journal of Automatica Sinica},
