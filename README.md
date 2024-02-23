@@ -1,6 +1,6 @@
 # DDNet
 
-[Paper](https://www.ieee-jas.net/en/article/doi/10.1109/JAS.2023.123813) | [Project Page](https://github.com/lzp990616/DDNet) 
+[Paper]([https://www.ieee-jas.net/en/article/doi/10.1109/JAS.2023.123813](https://ieeexplore.ieee.org/abstract/document/10433406)) | [Project Page](https://github.com/lzp990616/DDNet) 
 
 > DDNet: Dendritic Deep Learning for Medical Segmentation
 
@@ -72,15 +72,15 @@ Our code is based on [PyTorch](https://github.com/pytorch/pytorch).
 ## Citing DDNet
 
 ```bib
-@articleInfo{liu2024dendritic,
-author = {Zhipeng Liu","Zhiming Zhang","Zhenyu Lei","Masaaki Omura","Rong-Long Wang","Shangce Gao"}
-title = {Dendritic Deep Learning for Medical Segmentation},
-journal = {IEEE/CAA Journal of Automatica Sinica},
-year = {2023},
-volume = {10},
-number = {JAS-2023-0532},
-pages = {1},
-doi = {10.1109/JAS.2023.123813}
+@article{liu2024dendritic,
+  title={Dendritic deep learning for medical segmentation},
+  author={Liu, Zhipeng and Zhang, Zhiming and Lei, Zhenvu and Omura, Masaaki and Wang, Rong-Long and Gao, Shangce},
+  journal={IEEE/CAA Journal of Automatica Sinica},
+  volume={11},
+  number={3},
+  pages={803--805},
+  year={2024},
+  publisher={IEEE}
 }
 ```
 
