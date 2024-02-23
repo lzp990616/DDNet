@@ -1,6 +1,6 @@
 # DDNet
 
-[Paper]((https://ieeexplore.ieee.org/abstract/document/10433406)) | [Project Page](https://github.com/lzp990616/DDNet) 
+[Paper](https://ieeexplore.ieee.org/abstract/document/10433406) | [Project Page](https://github.com/lzp990616/DDNet) 
 
 > DDNet: Dendritic Deep Learning for Medical Segmentation
 
